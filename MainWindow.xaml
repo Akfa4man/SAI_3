@@ -1,0 +1,255 @@
+﻿<Window x:Class="SAI_3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Распознавание цифр (MLP, 5×7)"
+        MinHeight="420"
+        MinWidth="720"
+        Height="560"
+        Width="980"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="6"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ЛЕВАЯ ЧАСТЬ: Обучение -->
+        <Border Grid.Column="0"
+            MinWidth="260"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12"
+            Margin="0,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Обучение"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,10"/>
+
+                <Grid Grid.Row="1" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Количество эпох:" Width="170" VerticalAlignment="Center"/>
+                    <TextBox x:Name="EpochsBox" Grid.Column="1" MinWidth="90" Text="80"/>
+                </Grid>
+
+                <Grid Grid.Row="2" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Размер пакета (batch):" Width="170" VerticalAlignment="Center"/>
+                    <TextBox x:Name="BatchSizeBox" Grid.Column="1" MinWidth="90" Text="32"/>
+                </Grid>
+
+                <Grid Grid.Row="3" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Скорость обучения:" Width="170" VerticalAlignment="Center"/>
+                    <TextBox x:Name="LearningRateBox" Grid.Column="1" MinWidth="90" Text="0.03"/>
+                </Grid>
+
+                <Grid Grid.Row="4" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Шум (инверсия пикселя):" Width="170" VerticalAlignment="Center"/>
+                    <TextBox x:Name="NoiseBox" Grid.Column="1" MinWidth="90" Text="0.03"/>
+                </Grid>
+
+                <!-- Кнопки обучения: переносятся -->
+                <WrapPanel Grid.Row="5" Margin="0,8,0,8">
+                    <Button x:Name="TrainButton"
+                  Content="Обучить"
+                  MinWidth="120"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  Click="TrainButton_Click"/>
+                    <Button x:Name="StopButton"
+                  Content="Остановить"
+                  MinWidth="120"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  IsEnabled="False"
+                  Click="StopButton_Click"/>
+                </WrapPanel>
+
+                <ProgressBar Grid.Row="6"
+                     x:Name="TrainProgress"
+                     Height="18"
+                     Minimum="0"
+                     Maximum="100"
+                     Value="0"/>
+
+                <TextBlock Grid.Row="7"
+                   x:Name="StatusText"
+                   Margin="0,10,0,0"
+                   TextWrapping="Wrap"
+                   FontFamily="Consolas"
+                   Text="Готово."/>
+            </Grid>
+        </Border>
+
+        <!-- Разделитель (опционально) -->
+        <GridSplitter Grid.Column="1"
+                  Width="6"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  Background="#22000000"
+                  ShowsPreview="True"/>
+
+        <!-- ПРАВАЯ ЧАСТЬ: Рисование + распознавание -->
+        <Border Grid.Column="2"
+            MinWidth="320"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            CornerRadius="6"
+            Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Распознавание (нарисуйте цифру 5×7)"
+                   FontSize="18"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,10"/>
+
+                <!-- Верхние кнопки: переносятся -->
+                <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+                    <Button x:Name="ClearButton"
+                  Content="Очистить"
+                  MinWidth="120"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  Click="ClearButton_Click"/>
+
+                    <Button x:Name="PredictButton"
+                  Content="Распознать"
+                  MinWidth="120"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  Click="PredictButton_Click"/>
+
+                    <Button x:Name="SaveModelButton"
+                  Content="Сохранить модель"
+                  MinWidth="150"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  Click="SaveModelButton_Click"/>
+
+                    <Button x:Name="LoadModelButton"
+                  Content="Загрузить модель"
+                  MinWidth="150"
+                  Margin="0,0,8,8"
+                  Padding="10,6"
+                  Click="LoadModelButton_Click"/>
+
+                    <Border BorderBrush="#33000000" BorderThickness="1" CornerRadius="4" Padding="10,6" Margin="0,0,8,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Результат:" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="PredText" Margin="6,0,0,0" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+
+                <!-- Сетка 5×7: масштабируется -->
+                <Viewbox Grid.Row="2" Stretch="Uniform" Margin="0,0,0,10">
+                    <UniformGrid Rows="7" Columns="5">
+                        <!-- 35 ToggleButton, Tag = индекс 0..34 -->
+                        <ToggleButton Tag="0"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="1"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="2"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="3"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="4"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="5"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="6"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="7"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="8"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="9"  Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="10" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="11" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="12" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="13" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="14" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="15" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="16" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="17" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="18" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="19" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="20" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="21" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="22" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="23" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="24" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="25" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="26" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="27" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="28" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="29" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+
+                        <ToggleButton Tag="30" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="31" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="32" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="33" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                        <ToggleButton Tag="34" Click="Pixel_Click" Margin="3" MinWidth="40" MinHeight="40"/>
+                    </UniformGrid>
+                </Viewbox>
+
+                <!-- Запомнить как: переносится -->
+                <WrapPanel x:Name="RememberPanel" Grid.Row="3" Margin="0,6,0,6">
+                    <TextBlock Text="Запомнить как:" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                    <Button Content="0" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="1" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="2" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="3" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="4" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="5" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="6" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="7" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="8" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                    <Button Content="9" Margin="0,0,6,8" MinWidth="36" Click="RememberDigit_Click"/>
+                </WrapPanel>
+
+                <TextBlock Grid.Row="4"
+                   Text="Вероятности (0–9):"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,6"/>
+
+                <TextBlock Grid.Row="4"
+                   x:Name="ProbsText"
+                   FontFamily="Consolas"
+                   TextWrapping="Wrap"
+                   Margin="0,24,0,0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
