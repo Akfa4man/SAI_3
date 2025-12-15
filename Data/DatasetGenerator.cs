@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SAI_3.Neural;
+using System;
 using System.Collections.Generic;
 
 namespace SAI_3.Data
@@ -61,6 +62,8 @@ namespace SAI_3.Data
                                 x[p] = 1.0 - x[p];
                         }
                     }
+
+                    x = Preprocess.CropAndNormalizeTo5x7(x);
 
                     data.Add(new Sample(x, digit));
                 }

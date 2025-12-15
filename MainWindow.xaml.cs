@@ -210,7 +210,8 @@ namespace SAI_3
             }
 
             // Преобразуем булевы пиксели в double-вектор (0/1) для входа MLP.
-            double[] x = _pixels.Select(p => p ? 1.0 : 0.0).ToArray();
+            double[] xRaw = _pixels.Select(p => p ? 1.0 : 0.0).ToArray();
+            double[] x = Preprocess.CropAndNormalizeTo5x7(xRaw);
 
             int pred = _net.Predict(x);
             var probs = _net.PredictProba(x);
@@ -280,7 +281,8 @@ namespace SAI_3
             if (sender is not System.Windows.Controls.Button btn) return;
             if (!int.TryParse(btn.Content?.ToString(), out int label)) return;
 
-            double[] x = _pixels.Select(p => p ? 1.0 : 0.0).ToArray();
+            double[] xRaw = _pixels.Select(p => p ? 1.0 : 0.0).ToArray();
+            double[] x = Preprocess.CropAndNormalizeTo5x7(xRaw);
 
             try
             {
