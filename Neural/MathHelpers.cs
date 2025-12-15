@@ -128,5 +128,50 @@ namespace SAI_3.Neural
             double u2 = rng.NextDouble();
             return Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
         }
+
+        public static double[] Shift(double[] x, int dx, int dy)
+        {
+            var y = new double[35];
+
+            for (int r = 0; r < 7; r++)
+                for (int c = 0; c < 5; c++)
+                {
+                    int rr = r + dy;
+                    int cc = c + dx;
+                    if (rr < 0 || rr >= 7 || cc < 0 || cc >= 5) continue;
+
+                    y[rr * 5 + cc] = x[r * 5 + c];
+                }
+
+            return y;
+        }
+
+        public static double[] Center(double[] x)
+        {
+            int minR = 7, minC = 5, maxR = -1, maxC = -1;
+
+            for (int r = 0; r < 7; r++)
+                for (int c = 0; c < 5; c++)
+                {
+                    if (x[r * 5 + c] < 0.5) continue;
+                    if (r < minR) minR = r;
+                    if (c < minC) minC = c;
+                    if (r > maxR) maxR = r;
+                    if (c > maxC) maxC = c;
+                }
+
+            if (maxR < 0) return x;
+
+            int bboxCenterR = (minR + maxR) / 2;
+            int bboxCenterC = (minC + maxC) / 2;
+
+            int targetCenterR = 3;
+            int targetCenterC = 2;
+
+            int dy = targetCenterR - bboxCenterR;
+            int dx = targetCenterC - bboxCenterC;
+
+            return Shift(x, dx, dy);
+        }
     }
 }
