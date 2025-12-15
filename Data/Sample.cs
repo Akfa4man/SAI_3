@@ -1,19 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAI_3.Data
 {
     /// <summary>
-    /// Один пример данных: входной вектор X (например, 35 пикселей 5x7) и метка класса (0..9).
+    /// Один обучающий/тестовый пример для классификации.
+    /// <para>
+    /// Содержит входной вектор признаков
+    /// и целочисленную метку класса (например, цифра 0..9).
+    /// </para>
     /// </summary>
     public sealed class Sample
     {
+        /// <summary>
+        /// Вектор признаков (вход сети).
+        /// <para>
+        /// Обычно содержит значения в диапазоне [0; 1],
+        /// но конкретный диапазон зависит от этапа нормализации/предобработки.
+        /// </para>
+        /// </summary>
         public double[] X { get; }
+
+        /// <summary>
+        /// Метка класса (истинный ответ) для данного примера.
+        /// <para>
+        /// Для задачи распознавания цифр ожидается диапазон 0..9.
+        /// </para>
+        /// </summary>
         public int Label { get; }
 
+        /// <summary>
+        /// Создаёт новый пример данных.
+        /// </summary>
+        /// <param name="x">Входной вектор признаков.</param>
+        /// <param name="label">Метка класса.</param>
         public Sample(double[] x, int label)
         {
             X = x;
